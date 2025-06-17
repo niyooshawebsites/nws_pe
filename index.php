@@ -1,140 +1,129 @@
 <?php
+session_start();
+
+// Enable error reporting for development (disable in production)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require 'vendor/autoload.php';
-require 'config.php';
+include "api/create_subscription_and_account_and_license.php";
 
 use Razorpay\Api\Api;
+
+// the key and secreet are coming from config.php
+$api = new Api($razorpay_key, $razorpay_secret);
 
 $errors = [];
 $success = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name     = trim($_POST['name'] ?? '');
-    $email    = trim($_POST['email'] ?? '');
-    $phone    = trim($_POST['phone'] ?? '');
-    $password = $_POST['password'] ?? '';
+    $name = htmlspecialchars(trim($_POST['name'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+    $phone = preg_replace('/[^0-9]/', '', $_POST['phone'] ?? '');
+    $password = trim($_POST['password'] ?? '');
 
     if (!$name || !$email || !$phone || !$password) {
         $errors[] = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = "Invalid email address.";
+    } elseif (strlen($password) < 6) {
+        $errors[] = "Password must be at least 6 characters.";
+    } elseif (!preg_match('/^[0-9]{10}$/', $phone)) {
+        $errors[] = "Enter a valid 10-digit phone number.";
     } else {
-        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-
-        if ($stmt->rowCount() > 0) {
-            $errors[] = "Email already registered. Please log in.";
-        } else {
-            try {
-                $password_hash = password_hash($password, PASSWORD_BCRYPT);
-                $stmt = $pdo->prepare("INSERT INTO users (name, email, phone, password_hash) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$name, $email, $phone, $password_hash]);
-                $user_id = $pdo->lastInsertId();
-
-                $license_key = strtoupper(md5(uniqid($user_id . microtime(), true)));
-                $start_date = date('Y-m-d');
-                $expiry_date = date('Y-m-d', strtotime('+14 days'));
-
-                $api = new Api($razorpay_key, $razorpay_secret);
-                $subscription = $api->subscription->create([
-                    'plan_id' => 'plan_XXXXXX', // Replace with your actual plan ID
-                    'customer_notify' => 1,
-                    'total_count' => 12,
-                    'quantity' => 1,
-                    'trial_days' => 14,
-                    'notes' => [
-                        'user_id' => $user_id,
-                        'email' => $email
-                    ]
-                ]);
-
-                $stmt = $pdo->prepare("INSERT INTO licenses (user_id, license_key, start_date, expiry_date, is_active, razorpay_subscription_id, trial_used) VALUES (?, ?, ?, ?, 1, ?, 1)");
-                $stmt->execute([$user_id, $license_key, $start_date, $expiry_date, $subscription->id]);
-
-                $success = "Registration successful! Your license key: <strong>{$license_key}</strong>";
-            } catch (Exception $e) {
-                $errors[] = "Something went wrong: " . $e->getMessage();
-            }
+        // ✅ Call and catch errors from your function
+        try {
+            create_subscription_and_account_and_license($name, $email, $phone, $password, $api);
+            $success = "Your trial has started! Please <a href='login.php'>login here</a>.";
+        } catch (Exception $e) {
+            $errors[] = $e->getMessage();
         }
     }
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <title>Buy PHP App – 14 Day Free Trial</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buy PHP App – 14 Day Free Trial</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Lightbox2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.4/dist/css/lightbox.min.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
-</head>
+<?php include "comps/header.php"; ?>
+<?php include "comps/navbar.php"; ?>
 
 <body class="bg-light">
 
     <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
+        <div class="row justify-content-center align-items-start vh-100">
+            <div class="row justify-content-center align-items-center">
+                <div class="mb-5">
+                    <h1 class="text-center display-1 text-primary">Property Expert Applicaton</h1>
+                    <p class="text-center lead text-muted">Take your property business to the next level!</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="lead">Get the full PROPERTY EXPERT experience for</p>
+                    <h1 class="display-1 lead text-success">₹0 today</h1>
+                    <h5>₹666.67 INR per month, billed annually at ₹7,999/year after your 14-day trial. Cancel anytime.</h5>
+                    <p>A powerful SAAP tailored for property dealers, landlords, buyers, and tenants. Easily list, buy, sell, or rent properties with image galleries, and custom search features. Ideal for streamlining real estate operations.</p>
+                    <ul>
+                        <li>Supports Buyers, Sellers, Landlords and Tenants</li>
+                        <li>Supports Property Listings with images</li>
+                        <li>Smart property suggestions to Buyers and Tenants</li>
+                        <li>WhatsApp support quick messaging</li>
+                        <li>Social share for maximum reach</li>
+                        <li>Advanced filtering system</li>
+                        <li>Admin dashboard with listing approval functionality</li>
+                        <li>User dashboard for listing and sharing property requirements</li>
+                        <li>Loan Interest Calculator</li>
+                        <li>PW App for Android and IOS devices</li>
+                        <li>15+ languages support</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <?php if (!empty($errors)): ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <?= implode('<br>', $errors) ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php endif; ?>
 
-                <div class="card shadow-sm">
-                    <div class="card-header text-center bg-success text-white">
-                        <h3>Get 14-Day Free Trial</h3>
-                        <p class="mb-0">Auto-renews at ₹8000/year</p>
-                    </div>
-
-                    <div class="card-body">
-
-                        <?php if (!empty($errors)): ?>
-                            <div class="alert alert-danger">
-                                <?= implode('<br>', $errors) ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if ($success): ?>
-                            <div class="alert alert-success">
-                                <?= $success ?>
-                            </div>
-                        <?php else: ?>
+                    <?php if (!empty($success)): ?>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <?= $success ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php endif; ?>
+                    <div class="card shadow-sm">
+                        <div class="card-header text-center bg-success text-white">
+                            <h3>Get 14-Day Free Trial</h3>
+                            <p class="mb-0">Auto-renews at ₹7,999/year</p>
+                        </div>
+                        <div class="card-body">
                             <form method="POST" action="">
                                 <div class="mb-3">
                                     <label class="form-label">Full Name</label>
                                     <input type="text" name="name" class="form-control" required>
                                 </div>
-
                                 <div class="mb-3">
                                     <label class="form-label">Email address</label>
                                     <input type="email" name="email" class="form-control" required>
                                 </div>
-
                                 <div class="mb-3">
                                     <label class="form-label">Contact Number</label>
                                     <input type="tel" name="phone" class="form-control" required>
                                 </div>
-
                                 <div class="mb-3">
                                     <label class="form-label">Create Password</label>
                                     <input type="password" name="password" class="form-control" required>
                                 </div>
-
                                 <div class="d-grid">
-                                    <button type="submit" class="btn btn-success">Start Free Trial</button>
+                                    <button type="submit" class="btn btn-success">Register and Start Free Trial</button>
                                 </div>
+                                <p class="text-center text-muted mt-2">If you are already registered. Login to check your license details <a href="login.php">Login</a></p>
                             </form>
-                        <?php endif; ?>
-
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle (optional) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+    <?php include "comps/footer.php"; ?>
 </body>
 
 </html>
