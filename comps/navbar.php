@@ -1,8 +1,14 @@
+<?php
+require(__DIR__ . '/../helpers/base_URL.php');
+
+$baseURL = get_base_URL();
+?>
+
 <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
     <div class="container-fluid">
         <!-- Brand -->
-        <a class="navbar-brand" href="/index.php">
-            <img src="assets/img/logo.webp" style="width: 100px;" />
+        <a class="navbar-brand" href="index.php">
+            <img src="<?= $baseURL ?>assets/img/logo.webp" alt="Logo" style="width: 100px;">
         </a>
 
         <!-- Toggler -->
@@ -36,8 +42,17 @@
                         </li>
 
                     <?php else: ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.php">Register and Start FREE Trial</a>
+                        <li class="nav-item d-flex align-items-center mx-2">
+                            <i class="bi bi-phone" style="font-size: 20px"></i> <a class="nav-link" href="mailto:niyooshawebsites@gmail.com"> +919205504115</a>
+                        </li>
+                        <li class="nav-item d-flex align-items-center mx-2">
+                            <i class="bi bi-envelope" style="font-size: 20px"></i> <a class="nav-link" href="mailto:niyooshawebsites@gmail.com"> niyooshawebsites@gmail.com</a>
+                        </li>
+                        <li class="nav-item mx-2">
+                            <a class="btn btn-warning text-dark" href="https://niyooshawebsitesllp.in/">Main Website</a>
+                        </li>
+                        <li class="nav-item mx-2">
+                            <a class="btn btn-primary" href="index.php">Register and Start FREE Trial</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="login.php">Login</a>

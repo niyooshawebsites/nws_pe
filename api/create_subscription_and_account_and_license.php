@@ -1,6 +1,7 @@
 <?php
 
 require(__DIR__ . '/../db/db.php');
+require(__DIR__ . '/../config.php');
 
 function create_subscription_and_account_and_license($name, $email, $phone, $password, $api)
 {
@@ -57,11 +58,7 @@ function create_subscription_and_account_and_license($name, $email, $phone, $pas
         $user_id = $stmt->insert_id;
 
         // Generate secure license key
-        $raw_license = bin2hex(random_bytes(16));
-        $encryption_key = "your_secret_key_32_characters"; // Must be 32 chars
-        $iv = random_bytes(16);
-        $encrypted_license = openssl_encrypt($raw_license, "aes-256-cbc", $encryption_key, 0, $iv);
-        $encrypted_license = base64_encode($iv . $encrypted_license); // store IV with encrypted key
+        $license = strtoupper(bin2hex(random_bytes(16)));
 
         // Calculate dates
         $start_date = date('Y-m-d', time());
@@ -71,7 +68,7 @@ function create_subscription_and_account_and_license($name, $email, $phone, $pas
         $stmt = $conn->prepare("INSERT INTO licenses (user_id, license_key, start_date, expiry_date, is_active, razorpay_subscription_id, razorpay_customer_id, trial_used) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $active = 1;
         $trial = 1;
-        $stmt->bind_param("issssssi", $user_id, $encrypted_license, $start_date, $expiry_date, $active, $subscription->id, $customer->id, $trial);
+        $stmt->bind_param("issssssi", $user_id, $license, $start_date, $expiry_date, $active, $subscription->id, $customer->id, $trial);
         $stmt->execute();
 
         // Save subscription ID and user info in session:

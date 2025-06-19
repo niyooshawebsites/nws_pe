@@ -57,7 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="col-md-6">
                     <p class="lead">Get the full PROPERTY EXPERT experience for</p>
-                    <h1 class="display-1 lead text-success">₹0 today</h1>
+                    <p class="lead text-danger">@ less than the cost of a cup of coffee per day!!!</p>
+                    <h1 class="display-1 lead text-success">Pay ₹0 today</h1>
                     <h5>₹666.67 INR per month, billed annually at ₹7,999/year after your 14-day trial. Cancel anytime.</h5>
                     <p>A powerful SAAP tailored for property dealers, landlords, buyers, and tenants. Easily list, buy, sell, or rent properties with image galleries, and custom search features. Ideal for streamlining real estate operations.</p>
                     <ul>

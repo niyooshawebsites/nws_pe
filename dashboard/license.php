@@ -11,6 +11,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+require(__DIR__ . '/../config.php');
 include '../api/fetch_license_details.php';
 
 $userId = $_SESSION['user']['id'];
@@ -31,38 +32,51 @@ $result = fetchLicenseDetails($userId);
                 </div>
             </div>
 
-            <!-- License cards row -->
+            <!-- License logic -->
             <div class="row justify-content-center">
                 <?php if ($result->num_rows > 0): ?>
                     <?php while ($row = $result->fetch_assoc()): ?>
-                        <div class="col-md-6 col-lg-5 mb-4">
-                            <div class="card shadow-sm">
-                                <div class="card-header bg-success text-white text-center">
-                                    <strong>License Key:</strong> <?= htmlspecialchars($row['license_key']) ?>
-                                </div>
-                                <div class="card-body">
-                                    <p><strong>Domain:</strong> <?= htmlspecialchars($row['domain_name'] ?? 'Not assigned') ?></p>
-                                    <p><strong>Start Date:</strong> <?= date('F j, Y', strtotime($row['start_date'])) ?></p>
-                                    <p><strong>Expiry Date:</strong> <?= date('F j, Y', strtotime($row['expiry_date'])) ?></p>
-                                    <p><strong>Status:</strong>
-                                        <span class="badge <?= $row['is_active'] ? 'bg-success' : 'bg-danger' ?>">
-                                            <?= $row['is_active'] ? 'Active' : 'Inactive' ?>
-                                        </span>
-                                    </p>
-                                    <p><strong>Trial Used:</strong> <?= $row['trial_used'] ? 'Yes' : 'No' ?></p>
-                                    <p><strong>Razorpay Subscription ID:</strong> <?= htmlspecialchars($row['razorpay_subscription_id'] ?? 'N/A') ?></p>
-                                    <p><strong>Razorpay Customer ID:</strong> <?= htmlspecialchars($row['razorpay_customer_id']) ?></p>
-                                </div>
-                                <div class="card-footer text-center text-muted text-end">
-                                    Created: <?= date('F j, Y, g:i A', strtotime($row['created_at'])) ?>
+                        <?php if (!empty($row['razorpay_subscription_id']) && !empty($row['razorpay_customer_id'])): ?>
+                            <div class="col-md-6 col-lg-5 mb-4">
+                                <div class="card shadow-sm">
+                                    <div class="card-header bg-success text-white text-center">
+                                        <strong>License Key:</strong> <?= htmlspecialchars($row['license_key'] ?? 'Not assigned') ?>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Domain:</strong> <?= htmlspecialchars($row['domain_name'] ?? 'Not assigned') ?></p>
+                                        <p><strong>Start Date:</strong> <?= date('F j, Y', strtotime($row['start_date'])) ?></p>
+                                        <p><strong>Expiry Date:</strong> <?= date('F j, Y', strtotime($row['expiry_date'])) ?></p>
+                                        <p><strong>Status:</strong>
+                                            <span class="badge <?= $row['is_active'] ? 'bg-success' : 'bg-danger' ?>">
+                                                <?= $row['is_active'] ? 'Active' : 'Inactive' ?>
+                                            </span>
+                                        </p>
+                                        <p><strong>Trial Used:</strong> <?= $row['trial_used'] ? 'Yes' : 'No' ?></p>
+                                        <p><strong>Razorpay Subscription ID:</strong> <?= htmlspecialchars($row['razorpay_subscription_id']) ?></p>
+                                        <p><strong>Razorpay Customer ID:</strong> <?= htmlspecialchars($row['razorpay_customer_id']) ?></p>
+                                    </div>
+                                    <div class="card-footer text-center">
+                                        <a href="download.php" class="btn btn-primary" download>Download App</a>
+                                    </div>
+                                    <div class="card-footer text-muted text-center">
+                                        Created: <?= date('F j, Y, g:i A', strtotime($row['created_at'])) ?>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        <?php else: ?>
+                            <div class="col-12">
+                                <div class="alert alert-danger text-center">
+                                    You are not subscribed yet.<br>
+                                    <a href="../index.php" class="btn btn-warning mt-3">Subscribe Now to Access App & License</a>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     <?php endwhile; ?>
                 <?php else: ?>
                     <div class="col-12">
                         <div class="alert alert-warning text-center">
-                            No license found for your account.
+                            No license found for your account.<br>
+                            <a href="../index.php" class="btn btn-warning mt-3">Subscribe Now</a>
                         </div>
                     </div>
                 <?php endif; ?>
