@@ -3,8 +3,7 @@
 require(__DIR__ . '/../db/db.php');
 require(__DIR__ . '/../config.php');
 
-function create_subscription_and_account_and_license($name, $email, $phone, $password, $api)
-{
+function create_subscription_and_account_and_license($name, $email, $phone, $password, $api) {
     global $conn;
 
     try {
@@ -59,7 +58,7 @@ function create_subscription_and_account_and_license($name, $email, $phone, $pas
 
         // Generate secure license key
         $license = strtoupper(bin2hex(random_bytes(16)));
-
+        
         // Calculate dates
         $start_date = date('Y-m-d', time());
         $expiry_date = date('Y-m-d', strtotime("+1 year", $startAt));
@@ -76,12 +75,14 @@ function create_subscription_and_account_and_license($name, $email, $phone, $pas
         $_SESSION['customer_name'] = $name;
         $_SESSION['customer_email'] = $email;
         $_SESSION['customer_phone'] = $phone;
-
+        
         // Redirect to checkout page (your own)
-        header("Location: razorpay-subscribe.php");
+        header("Location: razorpay-subscribe");
         exit;
     } catch (Exception $e) {
         // Just rethrow so it can be caught in the calling script
         throw new Exception($e->getMessage());
     }
 }
+
+?>

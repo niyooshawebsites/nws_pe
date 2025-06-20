@@ -1,0 +1,35 @@
+RewriteEngine On
+
+# Protect config.php
+<Files "config.php">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</Files>
+
+# Redirect index.php to /
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/index\.php\sHTTP
+RewriteRule ^index\.php$ / [R=301,L]
+
+# Redirect .php URLs (except index.php) to extensionless
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php\sHTTP
+RewriteCond %1 !^index$
+RewriteRule ^ %1 [R=301,L]
+
+# Internally rewrite extensionless URLs to .php (except folders, index, and 404 page)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteCond %{REQUEST_URI} !^/(index|404)$
+RewriteRule ^(.+)$ $1.php [L]
+
+# Force 404 if nothing matches (except real files/folders)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)$ - [R=404,L]
+
+# Custom 404 Page
+ErrorDocument 404 /404.php

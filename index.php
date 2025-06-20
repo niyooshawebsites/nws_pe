@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // ✅ Call and catch errors from your function
         try {
             create_subscription_and_account_and_license($name, $email, $phone, $password, $api);
-            $success = "Your trial has started! Please <a href='login.php'>login here</a>.";
+            $success = "Your trial has started! Please <a href='login'>login here</a>.";
         } catch (Exception $e) {
             $errors[] = $e->getMessage();
         }
@@ -49,17 +49,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="bg-light">
 
     <div class="container py-5">
-        <div class="row justify-content-center align-items-start vh-100">
+        <div class="row justify-content-center align-items-start min-vh-100">
             <div class="row justify-content-center align-items-center">
-                <div class="mb-5">
-                    <h1 class="text-center display-1 text-primary">Property Expert Applicaton</h1>
-                    <p class="text-center lead text-muted">Take your property business to the next level!</p>
-                </div>
-                <div class="col-md-6">
+                <?php include 'comps/hero.php' ?>
+                <div class="col-md-8">
                     <p class="lead">Get the full PROPERTY EXPERT experience for</p>
                     <p class="lead text-danger">@ less than the cost of a cup of coffee per day!!!</p>
                     <h1 class="display-1 lead text-success">Pay ₹0 today</h1>
-                    <h5>₹666.67 INR per month, billed annually at ₹7,999/year after your 14-day trial. Cancel anytime.</h5>
+                    <h5>₹666.67 INR per month, billed annually at ₹7,999/year after your 14-day trial.</h5>
+                    <h5>Cancel anytime.</h5>
                     <p>A powerful SAAP tailored for property dealers, landlords, buyers, and tenants. Easily list, buy, sell, or rent properties with image galleries, and custom search features. Ideal for streamlining real estate operations.</p>
                     <ul>
                         <li>Supports Buyers, Sellers, Landlords and Tenants</li>
@@ -73,9 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <li>Loan Interest Calculator</li>
                         <li>PW App for Android and IOS devices</li>
                         <li>15+ languages support</li>
+                        <li>FREE Installation</li>
                     </ul>
+                    <span class="text-danger">* You have your Domain</span>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <?php if (!empty($errors)): ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <?= implode('<br>', $errors) ?>
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     <?php endif; ?>
                     <div class="card shadow-sm">
-                        <div class="card-header text-center bg-success text-white">
+                        <div class="card-header text-center bg-danger text-white">
                             <h3>Get 14-Day Free Trial</h3>
                             <p class="mb-0">Auto-renews at ₹7,999/year</p>
                         </div>
@@ -113,9 +113,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <input type="password" name="password" class="form-control" required>
                                 </div>
                                 <div class="d-grid">
-                                    <button type="submit" class="btn btn-success">Register and Start Free Trial</button>
+                                    <button type="submit" class="btn btn-danger">Subscribe and Start Free Trial</button>
                                 </div>
-                                <p class="text-center text-muted mt-2">If you are already registered. Login to check your license details <a href="login.php">Login</a></p>
+                                <p class="text-center text-muted mt-2">If you are already SUBSCRIBED. <br /> Login to check your license details <a href="login">Login</a></p>
                             </form>
                         </div>
                     </div>

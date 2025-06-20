@@ -10,9 +10,6 @@
     <!-- Lightbox2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.4/dist/css/lightbox.min.css">
 
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="manifest" href="/manifest.json">
-
     <?php if (!empty($customCSS)): ?>
         <style>
             <?= $customCSS ?>

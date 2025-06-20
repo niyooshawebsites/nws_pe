@@ -35,9 +35,6 @@ $baseURL = get_base_URL();
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="profile.php">Profile</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="logout.php">logout</a>
                         </li>
 
@@ -48,14 +45,20 @@ $baseURL = get_base_URL();
                         <li class="nav-item d-flex align-items-center mx-2">
                             <i class="bi bi-envelope" style="font-size: 20px"></i> <a class="nav-link" href="mailto:niyooshawebsites@gmail.com"> niyooshawebsites@gmail.com</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="reviews">Reviews</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="gallery">Gallery</a>
+                        </li>
                         <li class="nav-item mx-2">
                             <a class="btn btn-warning text-dark" href="https://niyooshawebsitesllp.in/">Main Website</a>
                         </li>
                         <li class="nav-item mx-2">
-                            <a class="btn btn-primary" href="index.php">Register and Start FREE Trial</a>
+                            <a class="btn btn-danger" href="./">Register and Start FREE Trial</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="login.php">Login</a>
+                            <a class="nav-link" href="login">Login</a>
                         </li>
                     <?php endif; ?>
                 </ul>
